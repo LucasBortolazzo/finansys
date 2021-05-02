@@ -1,36 +1,36 @@
-import { group } from '@angular/animations';
 import { Component, OnInit, AfterContentChecked } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
+
+import { Entry } from "../shared/entry.model";
+import { EntryService } from "../shared/entry.service";
+
+import { Category } from "../../categories/shared/category.model";
+import { CategoryService } from "../../categories/shared/category.service";
+
 import { switchMap } from "rxjs/operators";
 
-import toastr from "toastr"
-import { Category } from '../../categories/shared/category.model';
-import { CategoryService } from '../../categories/shared/category.service';
-
-// aplicação
-import { Entry } from "../shared/entry.model"
-import { EntryService } from "../shared/entry.service"
+import toastr from "toastr";
 
 @Component({
   selector: 'app-entry-form',
   templateUrl: './entry-form.component.html',
   styleUrls: ['./entry-form.component.css']
 })
-export class EntryFormComponent implements OnInit, AfterContentChecked {
-
+export class EntryFormComponent implements OnInit, AfterContentChecked{
+  
   currentAction: string;
   entryForm: FormGroup;
   pageTitle: string;
   serverErrorMessages: string[] = null;
   submittingForm: boolean = false;
   entry: Entry = new Entry();
-  categories: Array<Category> = [];
+  categories: Array<Category>;
 
   imaskConfig = {
     mask: Number,
     scale: 2,
-    thousandsSeparator: '.',
+    thousandsSeparator: '',
     padFractionalZeros: true,
     normalizeZeros: true,
     radix: ','
@@ -65,20 +65,20 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     this.loadCategories();
   }
 
-  ngAfterContentChecked() {
+  ngAfterContentChecked(){
     this.setPageTitle();
   }
 
-  submitForm() {
+  submitForm(){
     this.submittingForm = true;
 
-    if (this.currentAction === 'new')
+    if(this.currentAction == "new")
       this.createEntry();
-    else
+    else // currentAction == "edit"
       this.updateEntry();
   }
 
-  get typeOptions(): Array<any> {
+  get typeOptions(): Array<any>{
     return Object.entries(Entry.types).map(
       ([value, text]) => {
         return {
@@ -88,14 +88,15 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
       }
     )
   }
+
+
   // PRIVATE METHODS
 
   private setCurrentAction() {
-    if (this.route.snapshot.url[0].path === 'new') {
-      this.currentAction = 'new'
-    } else {
-      this.currentAction = 'edit';
-    }
+    if(this.route.snapshot.url[0].path == "new")
+      this.currentAction = "new"
+    else
+      this.currentAction = "edit"
   }
 
   private buildEntryForm() {
@@ -112,90 +113,78 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
   }
 
   private loadEntry() {
-    if (this.currentAction === 'edit') {
+    if (this.currentAction == "edit") {
+      
       this.route.paramMap.pipe(
-        switchMap((parametros) => this.entryService.getById(+parametros.get('id')))
-      ).subscribe(
-        (entry) => {
-          this.entry = entry,
-            this.entryForm.patchValue(this.entry)
-        },
-        (error) => alert('Ocorreu um erro no servidor')
+        switchMap(params => this.entryService.getById(+params.get("id")))
       )
-    } else {
-      this.entryForm.reset();
-    }
-  }
-
-  private setPageTitle() {
-    if (this.currentAction === 'edit') {
-      this.pageTitle = 'Editando lançamento'
-    } else {
-      this.pageTitle = 'Cadastrando novo lançamento';
-    }
-  }
-
-  private createEntry() {
-    const entry: Entry = Object.assign(new Entry(), this.entryForm.value);
-
-    this.entryService.create(entry)
       .subscribe(
-        (entry) => this.actionsForSuccess(entry),
-        (error) => this.actionsForError(error)
+        (entry) => {
+          this.entry = entry;
+          this.entryForm.patchValue(entry) // binds loaded entry data to EntryForm
+        },
+        (error) => alert('Ocorreu um erro no servidor, tente mais tarde.')
       )
-  }
-
-  private updateEntry() {
-    const entry: Entry = Object.assign(new Entry(), this.entryForm.value);
-
-    this.entryService.update(entry).subscribe(
-      (entry) => this.actionsForSuccess(entry),
-      (error) => this.actionsForError(error)
-    );
-  }
-
-  private actionsForSuccess(entry: Entry) {
-    toastr.options = {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": true,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "2000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    };
-
-    toastr.success('Solicitação processada com sucesso');
-
-
-    this.router.navigateByUrl('entries', { skipLocationChange: true }).then(
-      () => this.router.navigate(['entries', entry.id, 'edit'])
-    )
-  }
-
-  private actionsForError(error) {
-    toastr.error('Ocorreu um erro ao processar sua solicitação!');
-
-    this.submittingForm = false;
-
-    if (error.status === 422)
-      this.serverErrorMessages = JSON.parse(error._body).errors;
-    else
-      this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor, tente mais tarde.']
+    }
   }
 
   private loadCategories(){
     this.categoryService.getAll().subscribe(
-      (categories) => this.categories = categories,
-      (error) => alert('Ocorreu um erro ao carregar as categorias')
+      categories => this.categories = categories
+    );
+  }
+
+
+  private setPageTitle() {
+    if (this.currentAction == 'new')
+      this.pageTitle = "Cadastro de Novo Lançamento"
+    else{
+      const entryName = this.entry.name || ""
+      this.pageTitle = "Editando Lançamento: " + entryName;
+    }
+  }
+
+
+  private createEntry(){
+    const entry: Entry = Object.assign(new Entry(), this.entryForm.value);
+
+    this.entryService.create(entry)
+      .subscribe(
+        entry => this.actionsForSuccess(entry),
+        error => this.actionsForError(error)
+      )
+  }
+
+
+  private updateEntry(){
+    const entry: Entry = Object.assign(new Entry(), this.entryForm.value);
+
+    this.entryService.update(entry)
+      .subscribe(
+        entry => this.actionsForSuccess(entry),
+        error => this.actionsForError(error)
+      )
+  }
+
+  
+  private actionsForSuccess(entry: Entry){
+    toastr.success("Solicitação processada com sucesso!");
+
+    // redirect/reload component page
+    this.router.navigateByUrl("entries", {skipLocationChange: true}).then(
+      () => this.router.navigate(["entries", entry.id, "edit"])
     )
+  }
+
+
+  private actionsForError(error){
+    toastr.error("Ocorreu um erro ao processar a sua solicitação!");
+
+    this.submittingForm = false;
+
+    if(error.status === 422)
+      this.serverErrorMessages = JSON.parse(error._body).errors;
+    else
+      this.serverErrorMessages = ["Falha na comunicação com o servidor. Por favor, tente mais tarde."]
   }
 }
