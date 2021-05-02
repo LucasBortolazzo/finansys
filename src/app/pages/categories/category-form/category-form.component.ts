@@ -1,3 +1,4 @@
+import { group } from '@angular/animations';
 import { Component, OnInit, AfterContentChecked } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -36,44 +37,51 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     this.loadCategory();
   }
 
-  ngAfterContentChecked(){
+  ngAfterContentChecked() {
     this.setPageTitle();
   }
 
   // PRIVATE METHODS
+
   private setCurrentAction() {
-    this.route.snapshot.url[0].path === "new" ? this.currentAction = "new" : 
-                                                this.currentAction = "edit";
+    if (this.route.snapshot.url[0].path === 'new') {
+      this.currentAction = 'new'
+    } else {
+      this.currentAction = 'edit';
+    }
   }
 
-  private buildCategoryForm() {
+  private buildCategoryForm(){
     this.categoryForm = this.formBuilder.group({
       id: [null],
-      name: [null, [Validators.required, Validators.minLength(2)]],
-      description: [null]
-    });
+      name: [null, [Validators.required, Validators.minLength(10)]],
+      description: [null, [Validators.required]]
+    })
   }
 
-  private loadCategory(){
-    if (this.currentAction === 'edit') {
+  private loadCategory() {
+    if(this.currentAction === 'edit') {
       this.route.paramMap.pipe(
-        switchMap(params => this.categoryService.getById(+params.get("id")))
+        switchMap((parametros) => this.categoryService.getById(+parametros.get('id')))
       ).subscribe(
-        (category) => {
-          this.category = category;
-          this.categoryForm.patchValue(category);
+        (categoria) => {
+          this.category = categoria,
+          this.categoryForm.patchValue(this.category)
         },
-        (error) => alert("Ocorreu um erro no servidor, tente mais tarde")
+        (error) => alert('Ocorreu um erro no servidor')
       )
+    } else {
+      this.category = {};
+      this.categoryForm.reset();
     }
   }
 
   private setPageTitle() {
-    if (this.currentAction === 'new') {
-      this.pageTitle = 'Cadastro de nova categoria'
+    if(this.currentAction === 'edit') {
+      this.pageTitle = 'Editando categoria'
     } else {
-      const categoryName = this.category.name || ''; 
-      this.pageTitle = 'Editando categoria: '+ categoryName;
+      this.pageTitle = 'Cadastrando nova categoria';
     }
   }
+
 }

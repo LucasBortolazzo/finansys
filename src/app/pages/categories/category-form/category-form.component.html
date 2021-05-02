@@ -2,7 +2,7 @@
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
     <li class="breadcrumb-item"><a routerLink="/categories">Categorias</a></li>
-    <li class="breadcrumb-item active">Formulário de categorias</li>
+    <li class="breadcrumb-item active">Formulário de categoria</li>
   </ol>
 </nav>
 
@@ -12,14 +12,14 @@
       Formulário de categoria {{ currentAction }}
     </h1>
   </div>
-
   <div class="col-md">
     <a routerLink="/categories" class="btn btn-light float-right">
-      << Voltar </a>
+      << Voltar
+    </a>
   </div>
 </div>
 
-<form formGroup="categoryForm">
+<form [formGroup]="categoryForm">
 
   <div class="card">
     <div class="card-header">
