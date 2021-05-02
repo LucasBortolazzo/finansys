@@ -6,7 +6,7 @@ export class Entry {
         public name?: string,
         public description?: string,
         public type?: string,
-        public amout?: string,
+        public amount?: string,
         public date?: string,
         public paid?: boolean,
         public categoryId?: number,
@@ -18,7 +18,8 @@ export class Entry {
         renevue: 'Receita'
     }
 
-    get paidText(): string {
+    public get paidText(): string {
+        console.log('chamando metodo')
         return this.paid ? 'Pago' : 'Pendente';        
     }
 }

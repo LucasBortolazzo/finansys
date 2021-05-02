@@ -9,7 +9,7 @@ import { Entry } from "./entry.model"
 })
 export class EntryService {
 
-  private apiPath: string = "api/entryes";
+  private apiPath: string = "api/entries";
 
   constructor(private http: HttpClient) { }
 
@@ -40,7 +40,7 @@ export class EntryService {
     return this.http.put(url, entry).pipe(
       catchError(this.handleError),
       map(() => entry)
-    );    
+    );
   }
 
   delete(id: number): Observable<any> {
@@ -52,9 +52,13 @@ export class EntryService {
   }
 
   private jsonDataToEntries(jsonData: any[]): Entry[] {
-    const entryes: Entry[] = [];
-    jsonData.forEach(element => entryes.push(element as Entry))
-    return entryes;
+    const entries: Entry[] = [];
+    jsonData.forEach(element => {
+      const entry = Object.assign(new Entry(), element);
+
+      entries.push(entry)
+    })
+    return entries;
   }
 
   private handleError(error: any): Observable<any> {
