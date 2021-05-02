@@ -120,18 +120,19 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
       "progressBar": true,
       "positionClass": "toast-top-right",
       "preventDuplicates": false,
+      "onclick": null,
       "showDuration": "300",
       "hideDuration": "1000",
-      "timeOut": 0,
-      "extendedTimeOut": 0,
+      "timeOut": "2000",
+      "extendedTimeOut": "1000",
       "showEasing": "swing",
       "hideEasing": "linear",
       "showMethod": "fadeIn",
-      "hideMethod": "fadeOut",
-      "tapToDismiss": false
-    }
-        
+      "hideMethod": "fadeOut"
+    };
+    
     toastr.success('Solicitação processada com sucesso');
+
 
     this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
       () => this.router.navigate(['categories', category.id, 'edit'])
