@@ -16,6 +16,6 @@ import { IMaskModule } from 'angular-imask'
     ReactiveFormsModule,
     CalendarModule,
     IMaskModule,
-  ]
+  ],
 })
 export class EntriesModule { }

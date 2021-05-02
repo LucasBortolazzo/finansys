@@ -14,8 +14,9 @@ export class Entry {
     ){}
 
     static types = {
-        expanse: 'Despesa',
-        renevue: 'Receita'
+        renevue: 'Receita',        
+        expense: 'Despesa',
+
     }
 
     public get paidText(): string {
