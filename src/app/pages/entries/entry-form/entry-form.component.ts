@@ -24,6 +24,29 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
   submittingForm: boolean = false;
   entry: Entry = new Entry();
 
+  imaskConfig = {
+    mask: Number,
+    scale: 2,
+    thousandsSeparator: '.',
+    padFractionalZeros: true,
+    normalizeZeros: true,
+    radix: ','
+  };
+
+  ptBR = {
+    firstDayOfWeek: 0,
+    dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+    dayNamesMin: ['Do', 'Se', 'Te', 'Qu', 'Qu', 'Se', 'Sa'],
+    monthNames: [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
+      'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    today: 'Hoje',
+    clear: 'Limpar'
+  }
+
   constructor(
     private entryService: EntryService,
     private route: ActivatedRoute,
@@ -134,11 +157,11 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
     };
-    
+
     toastr.success('Solicitação processada com sucesso');
 
 
-    this.router.navigateByUrl('entries', {skipLocationChange: true}).then(
+    this.router.navigateByUrl('entries', { skipLocationChange: true }).then(
       () => this.router.navigate(['entries', entry.id, 'edit'])
     )
   }
@@ -150,7 +173,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
 
     if (error.status === 422)
       this.serverErrorMessages = JSON.parse(error._body).errors;
-    else 
-      this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor, tente mais tarde.']  
+    else
+      this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor, tente mais tarde.']
   }
 }
