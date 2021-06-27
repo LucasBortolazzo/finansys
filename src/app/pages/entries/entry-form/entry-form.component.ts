@@ -1,12 +1,11 @@
-import { Component, OnInit, AfterContentChecked, Injector } from '@angular/core';
+import { Component, OnInit, Injector } from '@angular/core';
 import { Validators } from "@angular/forms";
 
-// shared
-import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
+import { BaseResourceFormComponent } from "../../../shared/components/base-resource-form/base-resource-form.component"
 
-// aplicacao
 import { Entry } from "../shared/entry.model";
 import { EntryService } from "../shared/entry.service";
+
 import { Category } from "../../categories/shared/category.model";
 import { CategoryService } from "../../categories/shared/category.service";
 
@@ -15,8 +14,8 @@ import { CategoryService } from "../../categories/shared/category.service";
   templateUrl: './entry-form.component.html',
   styleUrls: ['./entry-form.component.css']
 })
-export class EntryFormComponent extends BaseResourceFormComponent<Entry> {
-  
+export class EntryFormComponent extends BaseResourceFormComponent<Entry> implements OnInit{
+
   categories: Array<Category>;
 
   imaskConfig = {
@@ -43,11 +42,11 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> {
   }
 
   constructor(
-    protected injector: Injector,
-    public resourceService: EntryService,
-    protected categoryService: CategoryService
+    protected entryService: EntryService,
+    protected categoryService: CategoryService,
+    protected injector: Injector
   ) {
-    super(injector, new Entry(), resourceService, Entry.fromJson);
+    super(injector, new Entry(), entryService, Entry.fromJson)
   }
 
   ngOnInit() {
@@ -65,6 +64,7 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> {
       }
     )
   }
+  
 
   protected buildResourceForm() {
     this.resourceForm = this.formBuilder.group({
@@ -85,4 +85,12 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> {
     );
   }
 
+  protected creationPageTitle(): string {
+    return "Cadastro de Novo Lançamento";
+  }
+
+  protected editionPageTitle(): string {
+    const resourceName = this.resource.name || "";
+    return "Editando Lançamento: " + resourceName;
+  }
 }
