@@ -1,8 +1,9 @@
+import { BaseResourceModel } from "src/app/shared/models/base-resource.model";
 import { Category } from "../../categories/shared/category.model";
 
-export class Entry {
+export class Entry extends BaseResourceModel {
     constructor(
-        public id?: number,
+        public id ?: number,
         public name?: string,
         public description?: string,
         public type?: string,
@@ -11,16 +12,22 @@ export class Entry {
         public paid?: boolean,
         public categoryId?: number,
         public category?: Category,
-    ){}
+    ) {
+        super();
+    }
 
     static types = {
-        revenue: 'Receita',        
+        revenue: 'Receita',
         expense: 'Despesa',
 
     }
 
+    static fromJson(jsonData: any): Entry {
+        return Object.assign(new Entry(), jsonData);
+    }
+
     public get paidText(): string {
         console.log('chamando metodo')
-        return this.paid ? 'Pago' : 'Pendente';        
+        return this.paid ? 'Pago' : 'Pendente';
     }
 }
